@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.HuiyiwenjianDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.huiyi_id as huiyiId
+        ,a.huiyiwenjian_name as huiyiwenjianName
+        ,a.huiyiwenjian_content as huiyiwenjianContent
+        ,a.huiyiwenjian_file as huiyiwenjianFile
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.HuiyiwenjianView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,huiyi.huiyishi_types as huiyishiTypes
+        ,huiyi.huiyi_name as huiyiName
+        ,huiyi.huiyiyuanyou_content as huiyiyuanyouContent
+        ,huiyi.yonghu_id as yonghuId
+        ,huiyi.huiyi_types as huiyiTypes
+        ,huiyi.huiyi_content as huiyiContent
+        ,huiyi.kaishi_time as kaishiTime
+        ,huiyi.jieshu_time as jieshuTime
+
+        FROM huiyiwenjian  a
+        left JOIN huiyi huiyi ON a.huiyi_id = huiyi.id
+
+        <where>
+            <if test="params.huiyiId != null">
+                and a.huiyi_id = #{params.huiyiId}
+            </if>
+            <if test=" params.huiyiwenjianName != '' and params.huiyiwenjianName != null and params.huiyiwenjianName != 'null' ">
+                and a.huiyiwenjian_name like CONCAT('%',#{params.huiyiwenjianName},'%')
+            </if>
+            <if test=" params.huiyiwenjianContent != '' and params.huiyiwenjianContent != null and params.huiyiwenjianContent != 'null' ">
+                and a.huiyiwenjian_content like CONCAT('%',#{params.huiyiwenjianContent},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and DATE_FORMAT(a.insert_time, '%Y-%m-%d %H:%T:%s') >=
+                DATE_FORMAT(#{params.insertTimeStart}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and DATE_FORMAT(a.insert_time, '%Y-%m-%d %H:%T:%s') <=
+                DATE_FORMAT(#{params.insertTimeEnd} , '%Y-%m-%d %H:%T:%s')    ]]>
+            </if>
+
+            <if test="params.huiyishiTypes != null">
+                and huiyi.huiyishi_types = #{params.huiyishiTypes}
+            </if>
+
+            <if test=" params.huiyiName != '' and params.huiyiName != null and params.huiyiName != 'null' ">
+                and huiyi.huiyi_name like CONCAT('%',#{params.huiyiName},'%')
+            </if>
+            <if test=" params.huiyiyuanyouContent != '' and params.huiyiyuanyouContent != null and params.huiyiyuanyouContent != 'null' ">
+                and huiyi.huiyiyuanyou_content like CONCAT('%',#{params.huiyiyuanyouContent},'%')
+            </if>
+            <if test="params.yonghuId != null">
+                and huiyi.yonghu_id = #{params.yonghuId}
+            </if>
+            <if test="params.huiyiTypes != null">
+                and huiyi.huiyi_types = #{params.huiyiTypes}
+            </if>
+
+            <if test=" params.huiyiContent != '' and params.huiyiContent != null and params.huiyiContent != 'null' ">
+                and huiyi.huiyi_content like CONCAT('%',#{params.huiyiContent},'%')
+            </if>
+            <if test=" params.kaishiTimeStart != '' and params.kaishiTimeStart != null ">
+                <![CDATA[  and DATE_FORMAT(huiyi.kaishi_time, '%Y-%m-%d %H:%T:%s') >=
+                DATE_FORMAT(#{params.kaishiTimeStart}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </if>
+            <if test=" params.kaishiTimeEnd != '' and params.kaishiTimeEnd != null ">
+                <![CDATA[  and DATE_FORMAT(huiyi.kaishi_time, '%Y-%m-%d %H:%T:%s') <=
+                DATE_FORMAT(#{params.kaishiTimeEnd} , '%Y-%m-%d %H:%T:%s')    ]]>
+            </if>
+            <if test=" params.jieshuTimeStart != '' and params.jieshuTimeStart != null ">
+                <![CDATA[  and DATE_FORMAT(huiyi.jieshu_time, '%Y-%m-%d %H:%T:%s') >=
+                DATE_FORMAT(#{params.jieshuTimeStart}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </if>
+            <if test=" params.jieshuTimeEnd != '' and params.jieshuTimeEnd != null ">
+                <![CDATA[  and DATE_FORMAT(huiyi.jieshu_time, '%Y-%m-%d %H:%T:%s') <=
+                DATE_FORMAT(#{params.jieshuTimeEnd} , '%Y-%m-%d %H:%T:%s')    ]]>
+            </if>
+        </where>
+        order by a.id desc
+    </select>
+
+</mapper>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.RenwuOneDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.fabuyonghu_id as fabuyonghuId
+        ,a.jieshouyonghu_id as jieshouyonghuId
+        ,a.renwu_one_types as renwuOneTypes
+        ,a.renwu_one_content as renwuOneContent
+        ,a.chakan_types as chakanTypes
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.RenwuOneView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--      发布人
+        ,fabuyonghu.name as         fabuname
+        ,fabuyonghu.phone as        fabuphone
+        ,fabuyonghu.id_number as    fabuidNumber
+
+--      接收人
+        ,jieshouyonghu.name as      jieshouname
+        ,jieshouyonghu.phone as     jieshouphone
+        ,jieshouyonghu.id_number as jieshouidNumber
+
+        FROM renwu_one  a
+        left JOIN yonghu fabuyonghu ON a.fabuyonghu_id = fabuyonghu.id
+        left JOIN yonghu jieshouyonghu ON a.jieshouyonghu_id = jieshouyonghu.id
+
+        <where>
+            <if test="params.fabuyonghuId != null">
+                and a.fabuyonghu_id = #{params.fabuyonghuId}
+            </if>
+            <if test="params.jieshouyonghuId != null">
+                and a.jieshouyonghu_id = #{params.jieshouyonghuId}
+            </if>
+            <if test="params.renwuOneTypes != null">
+                and a.renwu_one_types = #{params.renwuOneTypes}
+            </if>
+            <if test=" params.renwuOneContent != '' and params.renwuOneContent != null and params.renwuOneContent != 'null' ">
+                and a.renwu_one_content like CONCAT('%',#{params.renwuOneContent},'%')
+            </if>
+            <if test="params.chakanTypes != null">
+                and a.chakan_types = #{params.chakanTypes}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and DATE_FORMAT(a.insert_time, '%Y-%m-%d %H:%T:%s') >=
+                DATE_FORMAT(#{params.insertTimeStart}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and DATE_FORMAT(a.insert_time, '%Y-%m-%d %H:%T:%s') <=
+                DATE_FORMAT(#{params.insertTimeEnd} , '%Y-%m-%d %H:%T:%s')    ]]>
+            </if>
+
+            <!-- 发布人 -->
+            <if test=" params.fabuname != '' and params.fabuname != null and params.fabuname != 'null' ">
+                and fabuyonghu.name like CONCAT('%',#{params.fabuname},'%')
+            </if>
+            <if test=" params.fabuphone != '' and params.fabuphone != null and params.fabuphone != 'null' ">
+                and fabuyonghu.phone like CONCAT('%',#{params.fabuphone},'%')
+            </if>
+            <if test=" params.fabuidNumber != '' and params.fabuidNumber != null and params.fabuidNumber != 'null' ">
+                and fabuyonghu.id_number like CONCAT('%',#{params.fabuidNumber},'%')
+            </if>
+
+            <!-- 接收人 -->
+            <if test=" params.jieshouname != '' and params.jieshouname != null and params.jieshouname != 'null' ">
+                and jieshouyonghu.name like CONCAT('%',#{params.jieshouname},'%')
+            </if>
+            <if test=" params.jieshouphone != '' and params.jieshouphone != null and params.jieshouphone != 'null' ">
+                and jieshouyonghu.phone like CONCAT('%',#{params.jieshouphone},'%')
+            </if>
+            <if test=" params.jieshouidNumber != '' and params.jieshouidNumber != null and params.jieshouidNumber != 'null' ">
+                and jieshouyonghu.id_number like CONCAT('%',#{params.jieshouidNumber},'%')
+            </if>
+
+        </where>
+        order by a.id desc
+    </select>
+
+</mapper>
